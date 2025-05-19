@@ -1,0 +1,36 @@
+{
+  "__version__": "1.0.5",
+  "custom_joint_texture_layouts": [],
+  "layer": [
+    {
+      "name": "bullet",
+      "value": 1
+    },
+    {
+      "name": "enemy",
+      "value": 2
+    }
+  ],
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "bullet"
+      },
+      {
+        "index": 2,
+        "name": "enemy"
+      },
+      {
+        "index": 3,
+        "name": "player"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 15,
+      "1": 5,
+      "2": 11,
+      "3": 5
+    }
+  }
+}
