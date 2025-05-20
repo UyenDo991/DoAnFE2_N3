@@ -6,45 +6,60 @@ import { Global } from 'db://assets/Global/global';
 export class Enemy_2 extends Component {
     @property
     speed: number = 2;
-    speed_1: number = 10;
+    speed_bulletenemy: number = 10;
 
     @property
     detectRadius: number = 1.5; // Bán kính để xem có trúng đạn hay không
-    @property(Prefab)
 
-    enemy_bulletPrefab: Prefab = null!;
+    @property(Prefab)
+    bulletEnemyPrefab: Prefab = null!;
+
+    @property
+    fireCooldown: number = 0.3;
+    fireCooldown_Enemy: number = 3;
+    private timeSinceLastShot = 0;
 
     private hitCount: number = 0;//hit sát thương của bullet
     private hitCountClone: number = 0; //hit sát thương của clone bullet
     private _tempDir = new Vec3();
-    private fireCooldown = 0;
 
 
     start() {
          console.log('Enemy_2 started');
         // Đăng ký vào danh sách Enemy để Player có thể kiểm tra va chạm
         Global.instance.enemy2List.push(this.node);
+        // Tự hủy sau 5s
+       /* this.scheduleOnce(() => {
+            this.node.destroy();
+        }, 5);*/
     }
     update(deltaTime: number) {
         this.followPlayer(deltaTime);
         this.checkBulletCollision();
         this.checkPlayer();
         this.checkBulletCloneCollision();
-        this.fireBullet(deltaTime); //enemy_2 di chuyển tấn công player
+        this.timeSinceLastShot += deltaTime;
+
+        if (this.timeSinceLastShot >= this.fireCooldown_Enemy) {
+            this.fireBulletEnemy();
+            this.timeSinceLastShot = 0;
+        }
     }
-    //check lại
-   fireBullet(deltaTime: number) {
-        this.fireCooldown -= deltaTime;
-        if (this.fireCooldown > 0) return;
+    fireBulletEnemy() {
+        const playerPos = Global.instance.playerPosition;
+        const player = Global.instance.playerNode;
+        const enemyPos = this.node.worldPosition.clone(); // clone tránh lỗi tham chiếu
+        const bulletEnemy = instantiate(this.bulletEnemyPrefab);
 
-        const bullet = instantiate(this.enemy_bulletPrefab);
-        console.log(this.node)
-        bullet.setParent(this.node.parent);
-        bullet.setWorldPosition(this.node.worldPosition);
+        // Thêm vào scene trước
+        this.node.parent.addChild(bulletEnemy);
 
-        this.fireCooldown = 1.0; // Bắn mỗi 1 giây
+        //  Đặt vị trí sau khi đã thêm
+        bulletEnemy.setWorldPosition(enemyPos);
+        //console.log("Enemy bắn đạn tại vị trí: ", enemyPos);
     }
 
+    //Eneny di chuyển đến player
     followPlayer(deltaTime: number) {
         const playerPos = Global.instance.playerPosition;
         const enemyPos = this.node.worldPosition;
@@ -53,10 +68,11 @@ export class Enemy_2 extends Component {
         if (this._tempDir.length() > 0.01) {
             this._tempDir.normalize();
             const movement = this._tempDir.multiplyScalar(this.speed * deltaTime);
+           // console.log("followPlayer : " + movement);
             this.node.setWorldPosition(enemyPos.add(movement));
         }
     }
-
+    //Set va chạm giữa bullet va enemy
     checkBulletCollision() {
         const enemyPos = this.node.worldPosition;
         const bullets = Global.instance.bulletList;
@@ -81,6 +97,7 @@ export class Enemy_2 extends Component {
             }
         }
     }
+    //Set va chạm giữa bullet clone va enemy
     checkBulletCloneCollision() {
         const enemyPos = this.node.worldPosition;
         const bulletClones = Global.instance.bulletCloneList;
@@ -105,6 +122,8 @@ export class Enemy_2 extends Component {
             }
         }
     }
+    
+    //Set va chạm giữa player va enemy
     checkPlayer(){
         const enemyPos = this.node.worldPosition;
         const playerPos = Global.instance.playerPosition;

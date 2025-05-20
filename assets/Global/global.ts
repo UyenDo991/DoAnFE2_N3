@@ -13,6 +13,8 @@ export class Global {
     playerNode: Node = null;
     public playerHitCount: number = 0; //  Đếm số lần Player bị enemy tấn công
     bulletCloneList: Node[] = [];
+    bulletEnemyList: Node[] = [];
+    magicCircleList: Node[] = [];
 
     constructor() {
         Global.instance = this;

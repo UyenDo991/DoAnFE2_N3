@@ -1,4 +1,4 @@
-﻿import { _decorator, Component, tween, UIOpacity, Vec3, Quat } from 'cc';
+﻿import { _decorator, Component, tween, UIOpacity, Vec3, Quat, UITransform  } from 'cc';
 import { Global } from 'db://assets/Global/global'; // Đảm bảo đúng đường dẫn
 const { ccclass } = _decorator;
 
@@ -11,6 +11,14 @@ export class MagicCircle extends Component {
     private rotationSpeed = -40;
 
     private moveSpeed = 2.5; // Tốc độ di chuyển về target
+    getRadius(): number {
+        const uiTransform = this.node.getComponent(UITransform);
+        if (!uiTransform) {
+            console.warn('MagicCircle node is missing UITransform component!');
+            return 0;
+        }
+        return (uiTransform.contentSize.width / 2) * this.node.scale.x;
+    }
 
     start() {
         // Xuất hiện mờ dần
@@ -39,7 +47,15 @@ export class MagicCircle extends Component {
                 })
                 .start();
         }, 8);
+
+        //Check kích thước
+        const radius = this.getRadius();
+        console.log('Magic circle radius:', radius);    
+        //Đăng ký vào danh sách Enemy để magic circle có thể kiểm tra va chạm
+        Global.instance.magicCircleList.push(this.node);
+        
     }
+    
 
     update(deltaTime: number) {
         // Xoay

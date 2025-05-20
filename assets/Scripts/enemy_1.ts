@@ -1,5 +1,6 @@
 ﻿import { _decorator, Component, Vec3, Node } from 'cc';
 import { Global } from 'db://assets/Global/global';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('Enemy')
@@ -15,6 +16,12 @@ export class Enemy extends Component {
     private hitCountClone: number = 0; //hit sát thương của clone bullet
     private _tempDir = new Vec3();
 
+    //Magic Circel
+    @property
+    baseSpeed: number = 3;
+
+    private currentSpeed: number = 3;
+
 
 
     start() {
@@ -22,11 +29,41 @@ export class Enemy extends Component {
         Global.instance.enemyList.push(this.node);
     }
     update(deltaTime: number) {
-        this.followPlayer(deltaTime);
         this.checkBulletCollision();
         this.checkPlayer();
         this.checkBulletCloneCollision();
+
+       // this.checkMagicCircle(); // cập nhật currentSpeed
+        this.followPlayer(deltaTime);
     }
+    checkMagicCircle() {
+        const magicCircles = Global.instance.magicCircleList; // danh sách vòng
+        const enemyPos = this.node.worldPosition;
+        let isInside = false;
+
+        console.log("Danh sách vòng:", magicCircles.length);
+
+        for (let i = 0; i < magicCircles.length; i++) {
+            const circle = magicCircles[i];
+            const circlePos = circle.worldPosition;
+            const radius = 100; // Nếu cần tạm thời hard-code
+            const distance = Vec3.distance(enemyPos, circlePos);
+
+            console.log(`🌀 Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
+
+            if (distance < radius) {
+                isInside = true;
+                console.log("⚠️ Enemy đang trong vòng ma thuật!");
+                break;
+            }
+        }
+
+        // Luôn cập nhật lại currentSpeed cho chắc chắn
+        this.currentSpeed = isInside ? this.baseSpeed * 0.3 : this.baseSpeed;
+
+        console.log("✅ currentSpeed:", this.currentSpeed);
+    }
+
 
     followPlayer(deltaTime: number) {
         const playerPos = Global.instance.playerPosition;
@@ -35,9 +72,13 @@ export class Enemy extends Component {
         Vec3.subtract(this._tempDir, playerPos, enemyPos);
         if (this._tempDir.length() > 0.01) {
             this._tempDir.normalize();
-            const movement = this._tempDir.multiplyScalar(this.speed * deltaTime);
+            //const movement = this._tempDir.multiplyScalar(this.speed * deltaTime);
+            const movement = this._tempDir.multiplyScalar(this.currentSpeed * deltaTime);
             this.node.setWorldPosition(enemyPos.add(movement));
         }
+        console.log("currentSpeed:", this.currentSpeed);
+        console.log("enemyPos:", enemyPos);
+        console.log("playerPos:", playerPos);
     }
 
     checkBulletCollision() {
