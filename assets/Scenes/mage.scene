@@ -32,7 +32,7 @@
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 22
+      "__id__": 24
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -63,7 +63,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 23
+      "__id__": 28
     },
     "_id": "e2db3135-4f8c-4bbe-90a0-484a54167e5a"
   },
@@ -571,6 +571,9 @@
       },
       {
         "__id__": 21
+      },
+      {
+        "__id__": 22
       }
     ],
     "removedComponents": []
@@ -638,12 +641,35 @@
     }
   },
   {
+    "__type__": "CCPropertyOverrideInfo",
+    "targetInfo": {
+      "__id__": 23
+    },
+    "propertyPath": [
+      "enemyPrefab"
+    ],
+    "value": {
+      "__uuid__": "56cab01a-83a4-4947-aa6d-f8e98a95f4ae",
+      "__expectedType__": "cc.Prefab"
+    }
+  },
+  {
+    "__type__": "cc.TargetInfo",
+    "localID": [
+      "8bSKfBqs5G960KdO6FmiNf"
+    ]
+  },
+  {
     "__type__": "cc.PrefabInfo",
     "root": null,
     "asset": null,
     "fileId": "e2db3135-4f8c-4bbe-90a0-484a54167e5a",
     "instance": null,
-    "targetOverrides": null,
+    "targetOverrides": [
+      {
+        "__id__": 25
+      }
+    ],
     "nestedPrefabInstanceRoots": [
       {
         "__id__": 14
@@ -651,27 +677,57 @@
     ]
   },
   {
-    "__type__": "cc.SceneGlobals",
-    "ambient": {
-      "__id__": 24
+    "__type__": "cc.TargetOverrideInfo",
+    "source": {
+      "__id__": 14
     },
-    "shadows": {
-      "__id__": 25
-    },
-    "_skybox": {
+    "sourceInfo": {
       "__id__": 26
     },
-    "fog": {
+    "propertyPath": [
+      "enemyParent"
+    ],
+    "target": {
+      "__id__": 14
+    },
+    "targetInfo": {
       "__id__": 27
-    },
-    "octree": {
-      "__id__": 28
-    },
-    "skin": {
+    }
+  },
+  {
+    "__type__": "cc.TargetInfo",
+    "localID": [
+      "8bSKfBqs5G960KdO6FmiNf"
+    ]
+  },
+  {
+    "__type__": "cc.TargetInfo",
+    "localID": [
+      "363aflK0VDYJ9ZPkrAGcND"
+    ]
+  },
+  {
+    "__type__": "cc.SceneGlobals",
+    "ambient": {
       "__id__": 29
     },
-    "lightProbeInfo": {
+    "shadows": {
       "__id__": 30
+    },
+    "_skybox": {
+      "__id__": 31
+    },
+    "fog": {
+      "__id__": 32
+    },
+    "octree": {
+      "__id__": 33
+    },
+    "skin": {
+      "__id__": 34
+    },
+    "lightProbeInfo": {
+      "__id__": 35
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false
