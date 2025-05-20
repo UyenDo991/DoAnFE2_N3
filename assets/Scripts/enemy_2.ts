@@ -6,6 +6,7 @@ import { Global } from 'db://assets/Global/global';
 export class Enemy_2 extends Component {
     @property
     speed: number = 2;
+    speed_1: number = 10;
 
     @property
     detectRadius: number = 1.5; // Bán kính để xem có trúng đạn hay không
@@ -20,6 +21,7 @@ export class Enemy_2 extends Component {
 
 
     start() {
+         console.log('Enemy_2 started');
         // Đăng ký vào danh sách Enemy để Player có thể kiểm tra va chạm
         Global.instance.enemy2List.push(this.node);
     }
@@ -36,10 +38,11 @@ export class Enemy_2 extends Component {
         if (this.fireCooldown > 0) return;
 
         const bullet = instantiate(this.enemy_bulletPrefab);
+        console.log(this.node)
         bullet.setParent(this.node.parent);
         bullet.setWorldPosition(this.node.worldPosition);
 
-        this.fireCooldown = 5.0; // Bắn mỗi 1 giây
+        this.fireCooldown = 1.0; // Bắn mỗi 1 giây
     }
 
     followPlayer(deltaTime: number) {
