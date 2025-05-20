@@ -15,7 +15,7 @@ export class EnemyBullet extends Component {
         console.log('Enemy_2 started');
 
         const playerPos = Global.instance.playerPosition;
-        const bulletPos = this.node.getWorldPosition(); // ✅ Lấy vị trí toàn cục của node hiện tại
+        const bulletPos = this.node.getWorldPosition(); // Lấy vị trí toàn cục của node hiện tại
 
         this.direction = new Vec3();
         Vec3.subtract(this.direction, playerPos, bulletPos);
@@ -30,7 +30,7 @@ export class EnemyBullet extends Component {
     update(deltaTime: number) {
         const movement = this.direction.clone().multiplyScalar(this.speed * deltaTime);
         const currentPos = this.node.getPosition();
-        const newPos = currentPos.add(movement); // ✅ Tính toán mới dựa trên vị trí hiện tại
+        const newPos = currentPos.add(movement); // Tính toán mới dựa trên vị trí hiện tại
         this.node.setPosition(newPos);
     }
 }
