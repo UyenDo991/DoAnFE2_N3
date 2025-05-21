@@ -15,6 +15,7 @@ export class Global {
     bulletCloneList: Node[] = [];
     bulletEnemyList: Node[] = [];
     magicCircleList: Node[] = [];
+    public manaPlayer: number = 100; // Số lần player bị enemy tấn công thì player sẽ biến mất
 
     constructor() {
         Global.instance = this;

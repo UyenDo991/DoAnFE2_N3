@@ -33,38 +33,40 @@ export class Enemy extends Component {
         this.checkPlayer();
         this.checkBulletCloneCollision();
 
-       // this.checkMagicCircle(); // cập nhật currentSpeed
+        this.checkMagicCircle(); // cập nhật currentSpeed
         this.followPlayer(deltaTime);
     }
+    //Kiểm tra enemy có trong vòng tròn ma thuật hay không
     checkMagicCircle() {
-        const magicCircles = Global.instance.magicCircleList; // danh sách vòng
+        const magicCircles = Global.instance.magicCircleList;
         const enemyPos = this.node.worldPosition;
         let isInside = false;
 
-        console.log("Danh sách vòng:", magicCircles.length);
-
         for (let i = 0; i < magicCircles.length; i++) {
             const circle = magicCircles[i];
+            //Check node null hoặc bị destroy
+            if (!circle || !circle.isValid) {
+                //Xóa khỏi danh sách để tránh kiểm tra lại
+                magicCircles.splice(i, 1);
+                i--; // Giảm chỉ số để không bỏ sót phần tử tiếp theo
+                continue;
+            }
             const circlePos = circle.worldPosition;
-            const radius = 100; // Nếu cần tạm thời hard-code
+            const radius = 5;
             const distance = Vec3.distance(enemyPos, circlePos);
 
-            console.log(`🌀 Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
+            //console.log(`Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
 
             if (distance < radius) {
                 isInside = true;
-                console.log("⚠️ Enemy đang trong vòng ma thuật!");
+               // console.log("Enemy đang trong vòng ma thuật!");
                 break;
             }
         }
 
-        // Luôn cập nhật lại currentSpeed cho chắc chắn
         this.currentSpeed = isInside ? this.baseSpeed * 0.3 : this.baseSpeed;
-
-        console.log("✅ currentSpeed:", this.currentSpeed);
+        console.log("currentSpeed:", this.currentSpeed);
     }
-
-
     followPlayer(deltaTime: number) {
         const playerPos = Global.instance.playerPosition;
         const enemyPos = this.node.worldPosition;
@@ -139,7 +141,7 @@ export class Enemy extends Component {
             Global.instance.playerHitCount++;
             this.node.destroy();
             //Khi player bi va chạm 4 lần từ enemy thì player biến mất
-            if (Global.instance.playerHitCount >= 4) {
+            if (Global.instance.playerHitCount >= Global.instance.manaPlayer) {
                     console.log('player bị tiêu diệt!');
                     player.destroy();
             } 

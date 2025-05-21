@@ -12,6 +12,12 @@ export class EnemyBullet extends Component {
 
     private direction = new Vec3();
 
+    //Magic Circel
+    @property
+    baseSpeed: number = 3;
+
+    private currentSpeed: number = 3;
+
     start() {
         const playerPos = Global.instance.playerPosition;
         const bulletPos = this.node.getWorldPosition();
@@ -24,11 +30,49 @@ export class EnemyBullet extends Component {
     }
 
     update(deltaTime: number) {
-        const movement = this.direction.clone().multiplyScalar(this.speed * deltaTime);
+        this.followPlayer(deltaTime);
+        this.checkBulletEnemyCollision(); //Set va chạm giữa đạn của enemy va player
+        //Vong tròn ma thuật
+        this.checkMagicCircle(); // cập nhật currentSpeed
+    }
+    
+    //Kiểm tra enemy có trong vòng tròn ma thuật hay không
+    checkMagicCircle() {
+        const magicCircles = Global.instance.magicCircleList;
+        const bulletEnemyPos = this.node.worldPosition;
+        let isInside = false;
+
+        for (let i = 0; i < magicCircles.length; i++) {
+            const circle = magicCircles[i];
+            // Check node null hoặc bị destroy
+            if (!circle || !circle.isValid) {
+                // Xóa khỏi danh sách để tránh kiểm tra lại
+                magicCircles.splice(i, 1);
+                i--; // Giảm chỉ số để không bỏ sót phần tử tiếp theo
+                continue;
+            }
+            const circlePos = circle.worldPosition;
+            const radius = 5;
+            const distance = Vec3.distance(bulletEnemyPos, circlePos);
+
+            //console.log(`Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
+
+            if (distance < radius) {
+                isInside = true;
+               // console.log("Enemy đang trong vòng ma thuật!");
+                break;
+            }
+        }
+
+        this.currentSpeed = isInside ? this.baseSpeed * 0.3 : this.baseSpeed;
+        console.log("currentSpeed:", this.currentSpeed);
+    }
+    followPlayer(deltaTime: number) {
+       // const movement = this.direction.clone().multiplyScalar(this.speed * deltaTime);
+       const movement = this.direction.clone().multiplyScalar(this.currentSpeed * deltaTime);
         const currentPos = this.node.getPosition();
         const newPos = currentPos.add(movement);
         this.node.setPosition(newPos);
-        this.checkBulletEnemyCollision(); //Set va chạm giữa đạn của enemy va player
     }
     checkBulletEnemyCollision(){
         // Kiểm tra va chạm với player
@@ -38,7 +82,7 @@ export class EnemyBullet extends Component {
             console.log("Player bị trúng đạn enemy!");
             Global.instance.playerHitCount++;
 
-            if (Global.instance.playerHitCount >= 4) {
+            if (Global.instance.playerHitCount >= Global.instance.manaPlayer) {
                 Global.instance.playerNode.destroy();
                 console.log("Player bị tiêu diệt");
             }
