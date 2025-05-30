@@ -1,5 +1,5 @@
 ﻿import { _decorator, Component, Vec3, tween, UIOpacity } from 'cc';
-import { Global } from 'db://assets/Global/global.ts'; 
+import { Global } from 'db://assets/Global/global'; 
 const { ccclass, property } = _decorator;
 
 @ccclass('Clone')
@@ -26,6 +26,7 @@ export class Clone extends Component {
 
             tween(this.node)
                 .parallel(
+                    //thu nhỏ scale nhân vật clone
                     tween().to(1, { scale: new Vec3(0, 0, 0) }),
                     tween(uiOpacity).to(1, { opacity: 0 })
                 )

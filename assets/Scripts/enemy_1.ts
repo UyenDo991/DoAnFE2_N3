@@ -1,72 +1,36 @@
 ﻿import { _decorator, Component, Vec3, Node } from 'cc';
 import { Global } from 'db://assets/Global/global';
-
 const { ccclass, property } = _decorator;
 
 @ccclass('Enemy')
 export class Enemy extends Component {
 
     @property
-    speed: number = 3;
+    speed: number = 6;
+
+   
 
     @property
-    detectRadius: number = 1.5; // Bán kính để xem có trúng đạn hay không
+    detectRadius: number = 1.5; // bán kính va chạm với đạn
 
-    private hitCount: number = 0;//hit sát thương của bullet
-    private hitCountClone: number = 0; //hit sát thương của clone bullet
+    private hitEnemyCount: number = 0;
     private _tempDir = new Vec3();
 
-    //Magic Circel
-    @property
-    baseSpeed: number = 3;
-
-    private currentSpeed: number = 3;
-
-
+    private currentSpeed: number = 10; // tốc độ hiện tại
 
     start() {
-        // Đăng ký vào danh sách Enemy để Player có thể kiểm tra va chạm
         Global.instance.enemyList.push(this.node);
+        this.currentSpeed = this.speed; // khởi tạo tốc độ mặc định
     }
+
     update(deltaTime: number) {
-        this.checkBulletCollision();
-        this.checkPlayer();
-        this.checkBulletCloneCollision();
-
-        this.checkMagicCircle(); // cập nhật currentSpeed
+        this.checkMagicCircle();
         this.followPlayer(deltaTime);
+        this.checkBulletCollision();
+        this.checkCloneBulletCollision();
+        this.checkPlayer();
     }
-    //Kiểm tra enemy có trong vòng tròn ma thuật hay không
-    checkMagicCircle() {
-        const magicCircles = Global.instance.magicCircleList;
-        const enemyPos = this.node.worldPosition;
-        let isInside = false;
 
-        for (let i = 0; i < magicCircles.length; i++) {
-            const circle = magicCircles[i];
-            //Check node null hoặc bị destroy
-            if (!circle || !circle.isValid) {
-                //Xóa khỏi danh sách để tránh kiểm tra lại
-                magicCircles.splice(i, 1);
-                i--; // Giảm chỉ số để không bỏ sót phần tử tiếp theo
-                continue;
-            }
-            const circlePos = circle.worldPosition;
-            const radius = 5;
-            const distance = Vec3.distance(enemyPos, circlePos);
-
-            //console.log(`Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
-
-            if (distance < radius) {
-                isInside = true;
-               // console.log("Enemy đang trong vòng ma thuật!");
-                break;
-            }
-        }
-
-        this.currentSpeed = isInside ? this.baseSpeed * 0.3 : this.baseSpeed;
-        console.log("currentSpeed:", this.currentSpeed);
-    }
     followPlayer(deltaTime: number) {
         const playerPos = Global.instance.playerPosition;
         const enemyPos = this.node.worldPosition;
@@ -74,13 +38,9 @@ export class Enemy extends Component {
         Vec3.subtract(this._tempDir, playerPos, enemyPos);
         if (this._tempDir.length() > 0.01) {
             this._tempDir.normalize();
-            //const movement = this._tempDir.multiplyScalar(this.speed * deltaTime);
             const movement = this._tempDir.multiplyScalar(this.currentSpeed * deltaTime);
             this.node.setWorldPosition(enemyPos.add(movement));
         }
-        console.log("currentSpeed:", this.currentSpeed);
-        console.log("enemyPos:", enemyPos);
-        console.log("playerPos:", playerPos);
     }
 
     checkBulletCollision() {
@@ -94,59 +54,92 @@ export class Enemy extends Component {
 
             if (distance < this.detectRadius) {
                 console.log('Enemy trúng đạn!');
-
-                this.hitCount++;
+                this.hitEnemyCount++;
                 bullet.destroy();
 
-                if (this.hitCount >= 1) {
+                if (this.hitEnemyCount >= 1) {
                     console.log('Enemy bị tiêu diệt!');
+                    // Cộng 10 điểm cho người chơi
+                    Global.instance.addScore(10); 
                     this.node.destroy();
                 }
 
-                break; // chỉ trúng 1 viên mỗi frame
+                break;
             }
         }
     }
-    checkBulletCloneCollision() {
-        const enemyPos = this.node.worldPosition;
-        const bulletClones = Global.instance.bulletCloneList;
 
-        for (let i = 0; i < bulletClones.length; i++) {
-            const bulletClone = bulletClones[i];
-            const bulletClonePos = bulletClone.worldPosition;
-            const distance = Vec3.distance(enemyPos, bulletClonePos);
+    checkCloneBulletCollision() {
+        const enemyPos = this.node.worldPosition;
+        const bullets = Global.instance.clonebulletList;
+
+        for (let i = 0; i < bullets.length; i++) {
+            const bullet = bullets[i];
+            const bulletPos = bullet.worldPosition;
+            const distance = Vec3.distance(enemyPos, bulletPos);
 
             if (distance < this.detectRadius) {
-                console.log('Enemy trúng đạn bởi bullet clone!');
+                console.log('Enemy trúng đạn!');
+                this.hitEnemyCount++;
+                bullet.destroy();
 
-                this.hitCountClone++;
-                bulletClone.destroy();
-
-                if (this.hitCountClone >= 1) {
+                if (this.hitEnemyCount >= 1) {
                     console.log('Enemy bị tiêu diệt!');
+                    // Cộng 10 điểm cho người chơi
+                    Global.instance.addScore(10); 
                     this.node.destroy();
                 }
 
-                break; // chỉ trúng 1 viên mỗi frame
+                break;
             }
         }
     }
-    checkPlayer(){
+
+    checkPlayer() {
         const enemyPos = this.node.worldPosition;
         const playerPos = Global.instance.playerPosition;
         const player = Global.instance.playerNode;
         const distance = Vec3.distance(enemyPos, playerPos);
+
         if (distance < this.detectRadius) {
-           // console.log('Player đánh trúng!');
+            console.log('Player bị enemy đánh trúng!');
             Global.instance.playerHitCount++;
             this.node.destroy();
-            //Khi player bi va chạm 4 lần từ enemy thì player biến mất
-            if (Global.instance.playerHitCount >= Global.instance.manaPlayer) {
-                    console.log('player bị tiêu diệt!');
-                    player.destroy();
-            } 
-        }
-        
 
+            if (Global.instance.playerHitCount >= Global.instance.playerHP && player?.isValid) {
+                console.log('Player bị tiêu diệt!');
+                player.destroy();
+            }
+        }
+    }
+
+    checkMagicCircle() {
+        const magicCircles = Global.instance.magicCircleList;
+        const enemyPos = this.node.worldPosition;
+        let isInside = false;
+
+        for (let i = 0; i < magicCircles.length; i++) {
+            const circle = magicCircles[i];
+            //Check node null hoặc bị destroy
+            if (!circle || !circle.isValid) {
+                //Xóa khỏi danh sách để tránh kiểm tra lại
+                magicCircles.splice(i, 1);
+                // Giảm chỉ số để không bỏ sót phần tử tiếp theo
+                i--;
+                continue;
+            }
+            const circlePos = circle.worldPosition;
+            const radius = 5;
+            const distance = Vec3.distance(enemyPos, circlePos);
+            //console.log(`Vòng ${i} — Khoảng cách: ${distance}, Bán kính: ${radius}`);
+            if (distance < radius) {
+                isInside = true;
+               // console.log("Enemy đang trong vòng ma thuật!");
+                break;
+            }
+        }
+
+        this.currentSpeed = isInside ? this.speed * 0.3 : this.speed;
+        console.log("currentSpeed:", this.currentSpeed);
     }
 }

@@ -1,6 +1,7 @@
-﻿import { _decorator, Component, input, Input, EventKeyboard, EventMouse, KeyCode, Vec3, Camera, Node} from 'cc';
+﻿import { _decorator, Component, input, Input, EventKeyboard, EventMouse, KeyCode, Vec3, Camera, Node, profiler } from 'cc';
 import { Global } from 'db://assets/Global/global'; 
 const { ccclass, property } = _decorator;
+
 
 @ccclass('PlayerController')
 export class PlayerController extends Component {
@@ -19,6 +20,7 @@ export class PlayerController extends Component {
     private dashCooldown: number = 1; 
     private dashCooldownTimer: number = 0;
 
+    private hitCountPlayer: number = 0;
 
     detectRadius: number = 1.5; // Bán kính để xem có bị tác động hay không
 
@@ -28,6 +30,8 @@ export class PlayerController extends Component {
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         //Đăng ký player để Enemy có thể kiểm tra tác động 
         Global.instance.playerNode = this.node;
+       // profiler.hide();
+
 
     }
 
@@ -114,33 +118,4 @@ export class PlayerController extends Component {
             this.dashCooldownTimer = this.dashCooldown;
         }
     }
-    /*onCheckVaCham() {
-        const playerPos = Global.instance.playerPosition.clone();
-        const enemys = Global.instance.enemyList;
-
-            console.log("playerPos" + playerPos);
-        for (let i = 0; i < enemys.length; i++) {
-            const enemy = enemys[i];
-            const enemyPos = enemy.worldPosition;
-           // const distance = Vec3.distance(enemyPos, playerPos);
-            //console.log(enemyPos);
-           // console.log("playerPos" + playerPos);
-            if (distance < this.detectRadius) {
-                console.log('Player bị va chạm!');
-
-                this.hitCountPlayer++;
-                enemy.destroy();
-                console.log(this.hitCountPlayer);
-
-                if (this.hitCountPlayer >= 4) {
-                    console.log('Player bị die!');
-                    this.node.destroy();
-                }
-
-                break; 
-            }
-        }
-    }*/
-
-
 }

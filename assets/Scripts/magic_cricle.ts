@@ -43,6 +43,11 @@ export class MagicCircle extends Component {
                 .call(() => {
                     if (this.node && this.node.isValid) {
                         this.node.destroy();
+                        const list = Global.instance.magicCircleList;
+                        const index = list.indexOf(this.node);
+                        if (index !== -1) {
+                            list.splice(index, 1);
+                        }
                     }
                 })
                 .start();

@@ -1,4 +1,4 @@
-import { _decorator, Component, Prefab, Node, instantiate, Vec3 } from 'cc';
+﻿import { _decorator, Component, Prefab, Node, instantiate, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('Hold')
@@ -46,7 +46,7 @@ export class Hold extends Component {
         const pos = this.node.position.clone();
         pos.y += moveOffset;
 
-        // Giới hạn khung vị trí
+        // Giới hạn
         if (pos.y > this.maxY) {
             pos.y = this.maxY;
             this.moveDirection = -1;
@@ -61,7 +61,7 @@ export class Hold extends Component {
 
         this.node.setPosition(pos);
 
-        // Đổi hướng nếu thỏa thời gian
+        // Đổi hướng nếu đủ thời gian
         this.timeSinceDirectionChange += deltaTime;
         if (this.timeSinceDirectionChange >= this.currentChangeInterval) {
             this.moveDirection *= -1;
@@ -69,15 +69,17 @@ export class Hold extends Component {
             this.setRandomChangeInterval();
         }
     }
-    //set random thời gian đổi hướng di chuyển
+
     setRandomChangeInterval() {
-        this.currentChangeInterval = 4 + Math.random() * 6; // từ 4 đến 10 giây
+        // từ 4 đến 10 giây sẽ chuyển hướng
+        this.currentChangeInterval = 4 + Math.random() * 6; 
     }
-    //set thời gian sinh ra enemy
+
     setRandomCooldown() {
-        this.currentCooldown = 5 + Math.random() * 5; // từ 5 đến 10 giây
+        // từ 5 đến 10 giây sẽ sinh ra enemy
+        this.currentCooldown = 5 + Math.random() * 5; 
     }
-    //Ham sinh ra quai
+
     summon() {
         const enemy = instantiate(this.enemyPrefab);
         this.enemyParent.addChild(enemy);
